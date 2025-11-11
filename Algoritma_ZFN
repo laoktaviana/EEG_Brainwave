@@ -1,6 +1,4 @@
 import os
-import zipfile # This import is no longer needed, but keeping it for now
-import subprocess # This import is no longer needed, but keeping it for now
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -85,8 +83,8 @@ def create_ddn_model(input_shape, num_classes):
 
 def create_zfn(input_shape, num_classes):
     model = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(input_shape, 1)),  # Input dengan dimensi tambahan
-        tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=-1)),  # Menghapus dimensi ekstra
+        tf.keras.layers.Input(shape=(input_shape, 1)),  # Input with extra dimension
+        tf.keras.layers.Lambda(lambda x: tf.squeeze(x, axis=-1)),  # Removing extra dimension
         tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dropout(0.3),
         tf.keras.layers.Dense(128, activation='relu'),
@@ -196,7 +194,7 @@ def train_and_evaluate_model(model, xtrain, ytrain, xtest, ytest, output_folder,
     print(f"Final loss: {final_loss:.4f}")
     print(f"Final accuracy: {final_accuracy:.4f}")
 
-    # Simpan ke file
+    # Save to file
     with open(os.path.join(output_folder, f"training_time_{model_name}.txt"), "w") as f:
         f.write(f"Total training time (s): {training_time:.4f}\n")
         f.write(f"Time per epoch (s): {time_per_epoch:.4f}\n")
@@ -222,7 +220,7 @@ def train_and_evaluate_model(model, xtrain, ytrain, xtest, ytest, output_folder,
     with open(os.path.join(output_folder, f"classification_report_{model_name}.txt"), "w") as f:
         f.write(report)
 
-    # Set global seed untuk memastikan hasil reproducible
+    # Set global seed to ensure reproducible results
 def set_global_seed(seed=42):
     import random
     random.seed(seed)
@@ -242,7 +240,7 @@ if __name__ == "__main__":
     df = load_and_prepare_data(google_drive_url, extract_to)
     xtrain, xtest, ytrain, ytest, label_encoder = preprocess_data(df)
 
-    model_type = input("Pilih model (ddn/cnn/rnn/dnn/zfn): ").strip().lower()
+    model_type = input("Choose a model (ddn/cnn/rnn/dnn/zfn): ").strip().lower()
 
     if model_type == "ddn":
         model = create_ddn_model(xtrain.shape[1], len(set(ytrain)))
@@ -255,6 +253,6 @@ if __name__ == "__main__":
     elif model_type == "zfn":
          model = create_zfn(xtrain.shape[1], len(set(ytrain)))
     else:
-        raise ValueError("Model tidak valid! Pilih antara 'ddn', 'cnn', 'rnn', 'dnn', atau 'zfn'.")
+        raise ValueError("Invalid model! Choose between 'ddn', 'cnn', 'rnn', 'dnn', or 'zfn'.")
 
     train_and_evaluate_model(model, xtrain, ytrain, xtest, ytest, output_folder, label_encoder, model_type)
